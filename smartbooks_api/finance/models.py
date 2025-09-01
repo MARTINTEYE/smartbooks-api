@@ -2,25 +2,33 @@ from django.db import models
 from django.conf import settings
 
 class Account(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    ACCOUNT_TYPES = (
+        ("cash", "Cash"),
+        ("bank", "Bank"),
+        ("mobile_money", "Mobile Money"),
+        ("other", "Other"),
+    )
+
     name = models.CharField(max_length=100)
-    balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES, default="cash")
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
-
+        return f"{self.name} ({self.get_account_type_display()})"
 
 class Category(models.Model):
-    CATEGORY_TYPES = [
-        ('income', 'Income'),
-        ('expense', 'Expense'),
-    ]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    CATEGORY_TYPES = (
+        ("income", "Income"),
+        ("expense", "Expense"),
+    )
+
     name = models.CharField(max_length=100)
-    type = models.CharField(max_length=10, choices=CATEGORY_TYPES)
+    category_type = models.CharField(max_length=20, choices=CATEGORY_TYPES, default="expense")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.name} ({self.type})"
+        return f"{self.name} ({self.get_category_type_display()})"
 
 
 class Income(models.Model):
