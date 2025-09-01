@@ -1,7 +1,12 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.contrib.auth import get_user_model
 
+
+User = get_user_model()
+user = settings.AUTH_USER_MODEL
 
 class Account(models.Model):
     ACCOUNT_TYPES = (
@@ -62,3 +67,39 @@ class Expense(models.Model):
 
     def __str__(self):
         return f"Expense: {self.amount} on {self.date}"
+
+class Transaction(models.Model):
+    TRANSACTION_TYPES = (
+        ("income", "Income"),
+        ("expense", "Expense"),
+    )
+
+    user = models.ForeignKey(user, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="transactions")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="transactions")
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.transaction_type} - {self.amount} ({self.account})"
+
+from django.db import models
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Attachment(models.Model):
+    transaction = models.ForeignKey("Transaction", on_delete=models.CASCADE, related_name="attachments")
+    file = models.FileField(upload_to="attachments/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Attachment for {self.transaction.id}"
