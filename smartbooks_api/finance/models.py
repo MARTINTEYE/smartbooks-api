@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+
 
 class Account(models.Model):
     ACCOUNT_TYPES = (
@@ -17,6 +19,7 @@ class Account(models.Model):
     def __str__(self):
         return f"{self.name} ({self.get_account_type_display()})"
 
+
 class Category(models.Model):
     CATEGORY_TYPES = (
         ("income", "Income"),
@@ -32,24 +35,30 @@ class Category(models.Model):
 
 
 class Income(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="incomes")
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'type': 'income'})
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    description = models.TextField(blank=True, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    def clean(self):
+        if self.category.category_type != "income":
+            raise ValidationError("Category must be of type 'Income' for Income records.")
 
     def __str__(self):
-        return f"Income {self.amount} - {self.user}"
+        return f"Income: {self.amount} on {self.date}"
 
 
 class Expense(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="expenses")
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'type': 'expense'})
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    description = models.TextField(blank=True, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    def clean(self):
+        if self.category.category_type != "expense":
+            raise ValidationError("Category must be of type 'Expense' for Expense records.")
 
     def __str__(self):
-        return f"Expense {self.amount} - {self.user}"
+        return f"Expense: {self.amount} on {self.date}"
