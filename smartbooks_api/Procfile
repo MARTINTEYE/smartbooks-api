@@ -1,0 +1,1 @@
+web: gunicorn smartbooks_api.wsgi
