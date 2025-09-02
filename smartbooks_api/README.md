@@ -9,8 +9,7 @@ SmartBooks API is a backend project designed to manage personal and business fin
 - [API Endpoints](#api-endpoints)  
 - [Authentication](#authentication)  
 - [Reports & Export](#reports--export)  
-- [Demo Video](#demo-video)  
-- [License](#license)  
+ 
 
 
 # Features
@@ -33,11 +32,7 @@ SmartBooks API is a backend project designed to manage personal and business fin
 - MySQL (or SQLite for testing)  
 - DRF token authentication  
 - ReportLab (for PDF export)  
-- Pandas / CSV module (for CSV export)  
 
----
-
-## Setup Instructions
 
 1. **Clone the repository**
 ```bash
