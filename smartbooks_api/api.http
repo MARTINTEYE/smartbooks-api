@@ -1,0 +1,9 @@
+### Register User
+POST http://127.0.0.1:8000/api/users/register/
+Content-Type: application/json
+
+{
+  "username": "MARTINTEYE",
+  "password": "Martin@ICAG18",
+  "email": "martinteye93@gmail.com"
+}
